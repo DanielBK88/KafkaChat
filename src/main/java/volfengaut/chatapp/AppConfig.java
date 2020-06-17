@@ -4,10 +4,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Properties;
 import java.util.Scanner;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
+import org.hibernate.SessionFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -53,5 +56,10 @@ public class AppConfig {
     @Bean
     public Scanner scanner() {
         return new Scanner(System.in);
+    }
+    
+    @Bean
+    public EntityManagerFactory entityManagerFactory() {
+        return Persistence.createEntityManagerFactory("daniil.it_course");
     }
 }
