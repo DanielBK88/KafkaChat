@@ -1,12 +1,11 @@
 package volfengaut.chatapp.api.repository;
 
-import volfengaut.chatapp.entity.role.Permisson;
 import volfengaut.chatapp.entity.role.UserRole;
 
 /**
  * Interface for database operations concerning user roles
  **/
-public interface IRoleRepository {
+public interface IRoleRepository extends EntityManagerDependent {
     
     /**
      * Retrieves a user role by it's name
@@ -16,11 +15,11 @@ public interface IRoleRepository {
     /**
      * Removes the specified user role
      **/
-    boolean deleteUserRole(UserRole role);
+    void deleteUserRole(UserRole role);
 
     /**
      * Adds a new user role with the specified name and permissions
      **/
-    UserRole addUserRole(String name, Permisson... permissons);
+    void addUserRole(UserRole role);
     
 }

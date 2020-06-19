@@ -3,7 +3,7 @@ package volfengaut.chatapp.entity.role;
 /**
  * Permissions, which may be included in different user roles
  **/
-public enum Permisson {
+public enum Permission {
     
     /**
      * Permission to send public messages within a chat room

@@ -1,44 +1,87 @@
 package volfengaut.chatapp.service;
 
+import java.time.LocalDate;
+import java.util.Collection;
+import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import volfengaut.chatapp.api.repository.IUserRepository;
 import volfengaut.chatapp.api.service.IUserService;
+import volfengaut.chatapp.entity.chat_room.ChatRoom;
 import volfengaut.chatapp.entity.role.UserRole;
 import volfengaut.chatapp.entity.user.User;
 
 @Service
-public class UserService implements IUserService {
+public class UserService extends AbstractDataService implements IUserService {
 
-    @Autowired
+    @Setter(onMethod=@__({@Autowired}))
     private IUserRepository repository;
+
     
     @Override
     public User getUserByName(String name) {
-        if (name == null || name.length() == 0) {
-            throw new IllegalArgumentException("The name should not be null or empty!");
-        }
-        return repository.getUserByName(name);
+        checkUserName(name);
+        return doInTransaction(n -> {
+            return repository.getUserByName(n);
+        }, name, repository);
     }
 
     @Override
-    public boolean deleteUser(User user) {
-        if (user == null) {
-            throw new IllegalArgumentException("User should not be null!");
-        } else if (user.getLoginName() == null) {
-            throw new IllegalArgumentException("The user's login name should not be null!");
-        }
-        return repository.deleteUser(user);
+    public void deleteUser(User user) {
+        checkUser(user);
+        doInTransaction(u -> {
+            repository.deleteUser(u);
+        }, user, repository);
+
     }
 
     @Override
-    public User addUser(String name, UserRole role) {
-        if (name == null || name.length() == 0) {
-            throw new IllegalArgumentException("The name should not be null or empty!");
-        } else if (role == null) {
-            throw new IllegalArgumentException("The user role should not be null!");
-        }
-        return repository.addUser(name, role);
+    public void addUser(User user) {
+        checkUser(user);
+        doInTransaction(u -> {
+            repository.addUser(u);
+        }, user, repository);
+    }
+
+    @Override
+    public Collection<User> getUsersByRole(UserRole role) {
+        checkRole(role);
+        return doInTransaction(r -> {
+            return repository.getUsersByRole(r);
+        }, role, repository);
+    }
+
+    @Override
+    public Collection<User> getAuthorsOfMessagesContaining(String text) {
+        checkText(text);
+        return doInTransaction(t -> {
+            return repository.getAuthorsOfMessagesContaining(t);
+        }, text, repository);
+    }
+
+    @Override
+    public Collection<User> getUsersJoinedAfter(LocalDate time) {
+        checkDate(time);
+        return doInTransaction(t -> {
+            return repository.getUsersJoinedAfter(t);
+        }, time, repository);
+    }
+
+    @Override
+    public Collection<User> getChattersBannedFrom(ChatRoom room) {
+        checkRoom(room);
+        return doInTransaction(r -> {
+            return repository.getChattersBannedFrom(r);
+        }, room, repository);
+    }
+
+    @Override
+    public Collection<User> getChattersBannedBy(User user) {
+        checkUser(user);
+        return doInTransaction(u -> {
+            return repository.getChattersBannedBy(u);
+        }, user, repository); 
     }
 
 }

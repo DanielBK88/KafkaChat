@@ -1,23 +1,42 @@
 package volfengaut.chatapp.message;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import lombok.Getter;
+import volfengaut.chatapp.entity.chat_room.ChatRoom;
+import volfengaut.chatapp.entity.message.Message;
+import volfengaut.chatapp.entity.user.User;
 
 /**
  * An abstract chat message to be send via Kafka within a chat room.
  **/
+@Getter
 public abstract class AbstractMessage implements Serializable {
-
+    
     /**
      * The name of the author of this message
      **/
-    private final String authorName;
+    private String authorName;
+    
+    /**
+     * The name of the chat room, in which the message was sent
+     **/
+    private String chatRoomName;
+    
+    /**
+     * The date and time, when the message was send
+     **/
+    private LocalDateTime timeStamp;
 
-    public AbstractMessage(String authorName) {
+    public AbstractMessage(String authorName, String chatRoomName, LocalDateTime timeStamp) {
         this.authorName = authorName;
+        this.chatRoomName = chatRoomName;
+        this.timeStamp = timeStamp;
     }
-
-    public String getAuthorName() {
-        return authorName;
-    }
+    
+    /**
+     * Convert to an instance of {@link Message}, which can be persisted to the database
+     **/
+    public abstract Message toPersistableMessage(User author, User recipient, ChatRoom room);
 
 }

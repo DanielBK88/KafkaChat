@@ -1,25 +1,24 @@
 package volfengaut.chatapp.api.service;
 
-import volfengaut.chatapp.entity.role.Permisson;
 import volfengaut.chatapp.entity.role.UserRole;
 
 /**
- * Сервис по взаимодействию с ролями пользователей
+ * Used to manage user roles
  **/
 public interface IRoleService {
 
     /**
-     * Получение роли пользователя по названию
+     * Retrieve a user role by it's name
      **/
     UserRole getRoleByName(String name);
     
     /**
-     * Удаление роли пользователя
+     * Delete the specified user role
      **/
-    boolean deleteUserRole(UserRole role);
+    void deleteUserRole(UserRole role);
     
     /**
-     * Добавление новой роли пользователя с названием и разрешениями
+     * Persist the specified user role
      **/
-    UserRole addUserRole(String name, Permisson... permissons);
+    void addUserRole(UserRole role);
 }

@@ -1,6 +1,7 @@
 package volfengaut.chatapp.controller;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -12,6 +13,8 @@ import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import volfengaut.chatapp.api.service.IMessageService;
+import volfengaut.chatapp.api.service.IUserService;
 import volfengaut.chatapp.entity.chat_room.ChatRoom;
 import volfengaut.chatapp.entity.user.User;
 import volfengaut.chatapp.error.UnknownStatusChangeTypeException;
@@ -22,9 +25,9 @@ import volfengaut.chatapp.message.ChatterStatusChange;
 import volfengaut.chatapp.message.ChatterStatusChangeMessage;
 import volfengaut.chatapp.message.ExistingChatterInfoMessage;
 
-import static volfengaut.chatapp.entity.role.Permisson.REMOVE_CHATTER_FROM_CHAT_ROOM;
-import static volfengaut.chatapp.entity.role.Permisson.SEND_PRIVATE_MESSAGES;
-import static volfengaut.chatapp.entity.role.Permisson.SEND_PUBLIC_MESSAGES;
+import static volfengaut.chatapp.entity.role.Permission.REMOVE_CHATTER_FROM_CHAT_ROOM;
+import static volfengaut.chatapp.entity.role.Permission.SEND_PRIVATE_MESSAGES;
+import static volfengaut.chatapp.entity.role.Permission.SEND_PUBLIC_MESSAGES;
 import static volfengaut.chatapp.message.ChatterStatusChange.ENTERING;
 import static volfengaut.chatapp.message.ChatterStatusChange.LEAVING;
 
@@ -62,6 +65,11 @@ public class ChattingController {
      * The name of the chat room, where the current chat takes place.
      **/
     private String chatRoomName;
+    
+    /**
+     * The current chat room
+     **/
+    private ChatRoom chatRoom;
 
     /**
      * The consumer of Kafka messages
@@ -76,6 +84,12 @@ public class ChattingController {
 
     @Autowired
     private volatile Scanner scanner;
+    
+    @Autowired
+    private IMessageService messageService;
+    
+    @Autowired
+    private IUserService userService;
     
     /**
      * Called after leaving the chat room
@@ -97,9 +111,10 @@ public class ChattingController {
         this.exitFlag = false;
         this.loginName = user.getLoginName();
         this.chatRoomName = room.getName();
+        this.chatRoom = room;
         this.user = user;
         messageProducer.send(new ProducerRecord<>(chatRoomName, (messageCount.incrementAndGet() + loginName),
-                new ChatterStatusChangeMessage(loginName, ENTERING)));
+                new ChatterStatusChangeMessage(loginName, chatRoomName, LocalDateTime.now(), ENTERING)));
         System.out.println("You entered the chat room as " + loginName);
         
         new Thread(this::readingLoop).start();
@@ -116,6 +131,8 @@ public class ChattingController {
                     if (message == null || loginName.equals(message.getAuthorName())) {
                         continue;
                     }
+                    User author = userService.getUserByName(message.getAuthorName());
+                    messageService.addMessage(message.toPersistableMessage(author, user, chatRoom));
                     if (message instanceof ExistingChatterInfoMessage) {
                         if (otherChatters.add(message.getAuthorName())) {
                             System.out.println("(" + message.getAuthorName() + " is already in this chat room.)");
@@ -127,7 +144,7 @@ public class ChattingController {
                         if (ENTERING.equals(statusChange)) {
                             otherChatters.add(authorName);
                             messageProducer.send(new ProducerRecord<>(chatRoomName, (messageCount.incrementAndGet() + loginName),
-                                    new ExistingChatterInfoMessage(loginName)));
+                                    new ExistingChatterInfoMessage(loginName, chatRoomName, LocalDateTime.now())));
                             System.out.println(authorName + " enters the chat room.");
                         } else if (LEAVING.equals(statusChange)) {
                             otherChatters.remove(authorName);
@@ -137,13 +154,13 @@ public class ChattingController {
                         }
                     } else if (message instanceof ChatMessage) {
                         ChatMessage chatMessage = (ChatMessage) message;
-                        String author = chatMessage.getAuthorName();
+                        String authorName = chatMessage.getAuthorName();
                         String recipient = chatMessage.getRecipient();
                         if (recipient != null && !loginName.equals(recipient)) {
                             continue;
                         }
                         StringBuilder outputBuilder = new StringBuilder();
-                        outputBuilder.append(author);
+                        outputBuilder.append(authorName);
                         outputBuilder.append(recipient == null ? " (to all): " : " (to you): ");
                         outputBuilder.append(chatMessage.getMessageText());
                         System.out.println(outputBuilder.toString());
@@ -154,7 +171,7 @@ public class ChattingController {
                             continue;
                         }
                         System.out.println(message.getAuthorName() + " has banned you from this chat room! " 
-                                + "Reason: " + banMessage.getReason());
+                                + "Reason: " + banMessage.getBanReason());
                         exit();
                     }
                 }
@@ -165,6 +182,8 @@ public class ChattingController {
     private void writingLoop() {
         while (!exitFlag) {
             String command = scanner.nextLine();
+            AbstractMessage sentMessage = null;
+            User messageRecipient = null;
             if (command.equals(EXIT_COMMAND)) {
 
                 // Exit command
@@ -181,8 +200,10 @@ public class ChattingController {
                 for (String recipient : otherChatters) {
                     if (command.startsWith(recipient)) {
                         String message = command.substring(recipient.length() + 1);
-                        messageProducer.send(new ProducerRecord<>(chatRoomName, (messageCount.incrementAndGet() + loginName),
-                                new ChatMessage(loginName, message, recipient)));
+                        sentMessage = new ChatMessage(loginName, chatRoomName, LocalDateTime.now(), message, recipient);
+                        messageRecipient = userService.getUserByName(recipient);
+                        messageProducer.send(new ProducerRecord<>(chatRoomName, 
+                                (messageCount.incrementAndGet() + loginName), sentMessage));
                         validRecipient = true;
                         System.out.println("You (to " + recipient + "): " + message);
                         break;
@@ -203,8 +224,10 @@ public class ChattingController {
                 for (String recipient : otherChatters) {
                     if (command.startsWith(recipient)) {
                         String reason = command.substring(recipient.length() + 1);
-                        messageProducer.send(new ProducerRecord<>(chatRoomName, (messageCount.incrementAndGet() + loginName),
-                                new ChatterBannedMessage(loginName, reason, recipient)));
+                        sentMessage = new ChatterBannedMessage(loginName, chatRoomName, LocalDateTime.now(), reason, recipient);
+                        messageRecipient = userService.getUserByName(recipient);
+                        messageProducer.send(new ProducerRecord<>(chatRoomName, 
+                                (messageCount.incrementAndGet() + loginName), sentMessage));
                         validRecipient = true;
                         System.out.println("You banned the chatter " + recipient + " from this room");
                         break;
@@ -220,18 +243,23 @@ public class ChattingController {
                     System.out.println("Sorry, you have no permission to send public messages!");
                     continue;
                 }
-                messageProducer.send(new ProducerRecord<>(chatRoomName, (messageCount.incrementAndGet() + loginName),
-                        new ChatMessage(loginName, command, null)));
+                sentMessage = new ChatMessage(loginName, chatRoomName, LocalDateTime.now(), command, null);
+                messageProducer.send(new ProducerRecord<>(chatRoomName, 
+                        (messageCount.incrementAndGet() + loginName), sentMessage));
                 System.out.println("You (to all): " + command);
             }
-
+            if (sentMessage != null) {
+                messageService.addMessage(sentMessage.toPersistableMessage(user, messageRecipient, chatRoom));   
+            }
         }
     }
 
     private void exit() {
         exitFlag = true;
-        messageProducer.send(new ProducerRecord<>(chatRoomName, (messageCount.incrementAndGet() + loginName),
-                new ChatterStatusChangeMessage(loginName, LEAVING)));
+        AbstractMessage message = new ChatterStatusChangeMessage(loginName, chatRoomName, LocalDateTime.now(), LEAVING);
+        messageService.addMessage(message.toPersistableMessage(user, null, chatRoom));
+        messageProducer.send(new ProducerRecord<>(chatRoomName, 
+                (messageCount.incrementAndGet() + loginName), message));
         messageProducer.close();
         messageConsumer.close();
         selectRoomController.processRoomSelection(user);

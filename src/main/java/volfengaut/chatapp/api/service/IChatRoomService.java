@@ -1,7 +1,6 @@
 package volfengaut.chatapp.api.service;
 
 import volfengaut.chatapp.entity.chat_room.ChatRoom;
-import volfengaut.chatapp.entity.user.User;
 
 /**
  * Used to manage chat rooms
@@ -14,16 +13,13 @@ public interface IChatRoomService {
     ChatRoom getChatRoom(String name);
 
     /**
-     * Creates a new chat room (and a corresponding Kafka topic), if it does not yet exist.
-     * @param name the name of the new chat room
-     * @param creator the 
-     * @return true, if the chat room (topic) did not yet exist.
+     * Creates a new chat room
      **/
-    ChatRoom createChatRoom(String name, User creator);
+    void createChatRoom(ChatRoom room);
     
     /**
      * Deletes the specified chat room.
      **/
-    boolean deleteChatRoom(ChatRoom room);
+    void deleteChatRoom(ChatRoom room);
     
 }

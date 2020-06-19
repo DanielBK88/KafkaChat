@@ -3,11 +3,12 @@ package volfengaut.chatapp.controller;
 import java.util.Scanner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import volfengaut.chatapp.api.service.IChatRoomService;
+import volfengaut.chatapp.api.service.ITopicService;
 import volfengaut.chatapp.entity.chat_room.ChatRoom;
 import volfengaut.chatapp.entity.user.User;
-import volfengaut.chatapp.service.ChatRoomService;
 
-import static volfengaut.chatapp.entity.role.Permisson.CREATE_CHAT_ROOM;
+import static volfengaut.chatapp.entity.role.Permission.CREATE_CHAT_ROOM;
 
 /**
  * The controller handling the selection of a chat room by a chatter
@@ -39,7 +40,10 @@ public class SelectRoomController {
     private Scanner scanner;
     
     @Autowired
-    private ChatRoomService chatRoomService;
+    private IChatRoomService chatRoomService;
+    
+    @Autowired
+    private ITopicService topicService;
     
     public ChatRoom processRoomSelection(User user) {
         roomSelection : while (true) {
@@ -47,6 +51,7 @@ public class SelectRoomController {
             String roomName = scanner.nextLine();
             ChatRoom room = chatRoomService.getChatRoom(roomName);
             if (room != null) {
+                topicService.createTopicIfAbsent(roomName);
                 return room;
             } else if (user.hasPermission(CREATE_CHAT_ROOM)) {
                 System.out.println("The specified room does not yet exist. Do you want to create it?");
@@ -56,7 +61,10 @@ public class SelectRoomController {
                     String command = scanner.nextLine();
                     switch (command) {
                         case SUBMIT_COMMAND:
-                            return chatRoomService.createChatRoom(roomName, user);
+                            ChatRoom newRoom = new ChatRoom(roomName, user);
+                            chatRoomService.createChatRoom(newRoom);
+                            topicService.createTopicIfAbsent(roomName);
+                            return newRoom;
                         case DECLINE_COMMAND:
                             continue roomSelection;
                         default:

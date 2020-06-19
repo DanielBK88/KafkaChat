@@ -1,12 +1,11 @@
 package volfengaut.chatapp.api.repository;
 
 import volfengaut.chatapp.entity.chat_room.ChatRoom;
-import volfengaut.chatapp.entity.user.User;
 
 /**
  * Interface for database operations concerning chat rooms
  **/
-public interface IChatRoomRepository {
+public interface IChatRoomRepository extends EntityManagerDependent {
 
     /**
      * Retrieves an existing chat room by it's name
@@ -16,10 +15,10 @@ public interface IChatRoomRepository {
     /**
      * Adds a new chat room with the specified name and creator
      **/
-    ChatRoom addChatRoom(String name, User creator);
+    void addChatRoom(ChatRoom chatRoom);
     
     /**
      * Deletes the specified chat room
      **/
-    boolean deleteChatRoom(ChatRoom chatRoom);
+    void deleteChatRoom(ChatRoom chatRoom);
 }

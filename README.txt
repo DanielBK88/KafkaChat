@@ -29,3 +29,5 @@ When beginning the input with "-ban <some-player-name>", the corresponding chatt
 (needs admin permissions!). The following text of the input will be shown as the reason of banning to the banned user.
 
 5) To exit the chat room and the application, type "exit".
+
+6) UNIT TESTS are currently configured to run on a separate hsql data base. Change the configuration if needed.

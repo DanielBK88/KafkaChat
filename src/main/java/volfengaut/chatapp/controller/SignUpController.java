@@ -1,5 +1,6 @@
 package volfengaut.chatapp.controller;
 
+import java.time.LocalDate;
 import java.util.Scanner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -53,7 +54,9 @@ public class SignUpController {
             switch (command) {
                 case SIGN_UP_COMMAND:
                     UserRole chatterRole = roleService.getRoleByName(CHATTER_ROLE_NAME);
-                    return userService.addUser(loginName, chatterRole);
+                    User user = new User(loginName, chatterRole, LocalDate.now());
+                    userService.addUser(user);
+                    return user;
                 case LOGIN_COMMAND:
                     return null;
                 case EXIT_COMMAND:

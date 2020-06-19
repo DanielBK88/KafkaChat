@@ -1,44 +1,40 @@
 package volfengaut.chatapp.service;
 
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import volfengaut.chatapp.api.repository.IRoleRepository;
 import volfengaut.chatapp.api.service.IRoleService;
-import volfengaut.chatapp.entity.role.Permisson;
 import volfengaut.chatapp.entity.role.UserRole;
 
 @Service
-public class RoleService implements IRoleService {
+public class RoleService extends AbstractDataService implements IRoleService {
 
-    @Autowired
+    @Setter(onMethod=@__({@Autowired}))
     private IRoleRepository repository;
     
     @Override
     public UserRole getRoleByName(String name) {
-        if (name == null || name.length() == 0) {
-            throw new IllegalArgumentException("The name should not be null or empty!");
-        }
-        return repository.getRoleByName(name);
+        checkRoleName(name);
+        return doInTransaction(n -> {
+            return repository.getRoleByName(name);
+        }, name, repository);
     }
 
     @Override
-    public boolean deleteUserRole(UserRole role) {
-        if (role == null) {
-            throw new IllegalArgumentException("The user role should not be null!");
-        } else if (role.getName() == null || role.getName().length() == 0) {
-            throw new IllegalArgumentException("The user role's name should not be null or empty!");
-        }
-        return repository.deleteUserRole(role);
+    public void deleteUserRole(UserRole role) {
+        checkRole(role);
+        doInTransaction(r -> {
+            repository.deleteUserRole(r);
+        }, role, repository);
     }
 
     @Override
-    public UserRole addUserRole(String name, Permisson... permissons) {
-        if (name == null || name.length() == 0) {
-            throw new IllegalArgumentException("The name should not be null or empty!");
-        } else if (permissons.length == 0) {
-            throw new IllegalArgumentException("The role should have at least one permission!");
-        }
-        return repository.addUserRole(name, permissons);
+    public void addUserRole(UserRole role) {
+        checkRole(role);
+        doInTransaction(r -> {
+            repository.addUserRole(r);
+        }, role, repository);
     }
 
 }
