@@ -13,9 +13,12 @@ import org.springframework.stereotype.Repository;
 import volfengaut.chatapp.api.repository.IUserRepository;
 import volfengaut.chatapp.entity.chat_room.ChatRoom;
 import volfengaut.chatapp.entity.chat_room.ChatRoom_;
-import volfengaut.chatapp.entity.message.Message;
+import volfengaut.chatapp.entity.message.AbstractMessageEntity;
+import volfengaut.chatapp.entity.message.BanMessageEntity;
+import volfengaut.chatapp.entity.message.BanMessageEntity_;
+import volfengaut.chatapp.entity.message.ChatMessageEntity;
+import volfengaut.chatapp.entity.message.ChatMessageEntity_;
 import volfengaut.chatapp.entity.message.MessageType;
-import volfengaut.chatapp.entity.message.Message_;
 import volfengaut.chatapp.entity.role.UserRole;
 import volfengaut.chatapp.entity.user.User;
 import volfengaut.chatapp.entity.user.User_;
@@ -57,11 +60,11 @@ public class UserRepository implements IUserRepository {
     public Collection<User> getAuthorsOfMessagesContaining(String text) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<User> criteriaQuery = criteriaBuilder.createQuery(User.class);
-        Root<Message> root = criteriaQuery.from(Message.class);
-        Join<Message, User> joinToUsers = root.join(Message_.AUTHOR);
+        Root<ChatMessageEntity> root = criteriaQuery.from(ChatMessageEntity.class);
+        Join<ChatMessageEntity, User> joinToUsers = root.join(ChatMessageEntity_.AUTHOR);
 
         criteriaQuery.multiselect(joinToUsers.get(User_.LOGIN_NAME), joinToUsers.get(User_.ROLE), joinToUsers.get(User_.DATE_JOINED))
-                .where(criteriaBuilder.like(root.get(Message_.TEXT), "%" + text + "%"));
+                .where(criteriaBuilder.like(root.get(ChatMessageEntity_.TEXT), "%" + text + "%"));
 
         return new HashSet<>(entityManager.createQuery(criteriaQuery).getResultList());
     }
@@ -83,17 +86,14 @@ public class UserRepository implements IUserRepository {
     public Collection<User> getChattersBannedFrom(ChatRoom room) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<User> criteriaQuery = criteriaBuilder.createQuery(User.class);
-        Root<Message> root = criteriaQuery.from(Message.class);
-        Join<Message, User> joinToUsers = root.join(Message_.RECIPIENT);
-        Join<Message, ChatRoom> joinToRooms = root.join(Message_.ROOM);
+        Root<BanMessageEntity> root = criteriaQuery.from(BanMessageEntity.class);
+        Join<BanMessageEntity, User> joinToUsers = root.join(BanMessageEntity_.BANNED_CHATTER);
+        Join<BanMessageEntity, ChatRoom> joinToRooms = root.join(BanMessageEntity_.ROOM);
         
         criteriaQuery.multiselect(joinToUsers.get(User_.LOGIN_NAME), joinToUsers.get(User_.ROLE), 
                 joinToUsers.get(User_.DATE_JOINED))
                 
-                .where(criteriaBuilder.and(
-                        criteriaBuilder.equal(root.get(Message_.TYPE), MessageType.BAN),
-                        criteriaBuilder.equal(joinToRooms.get(ChatRoom_.NAME), room.getName())
-                ));
+                .where(criteriaBuilder.equal(joinToRooms.get(ChatRoom_.NAME), room.getName()));
 
         return new HashSet<>(entityManager.createQuery(criteriaQuery).getResultList());
     }
@@ -102,17 +102,14 @@ public class UserRepository implements IUserRepository {
     public Collection<User> getChattersBannedBy(User user) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<User> criteriaQuery = criteriaBuilder.createQuery(User.class);
-        Root<Message> root = criteriaQuery.from(Message.class);
-        Join<Message, User> joinToRecipients = root.join(Message_.RECIPIENT);
-        Join<Message, User> joinToAuthors = root.join(Message_.AUTHOR);
+        Root<BanMessageEntity> root = criteriaQuery.from(BanMessageEntity.class);
+        Join<BanMessageEntity, User> joinToRecipients = root.join(BanMessageEntity_.BANNED_CHATTER);
+        Join<BanMessageEntity, User> joinToAuthors = root.join(BanMessageEntity_.AUTHOR);
 
         criteriaQuery.multiselect(joinToRecipients.get(User_.LOGIN_NAME), joinToRecipients.get(User_.ROLE), 
                 joinToRecipients.get(User_.DATE_JOINED))
                 
-                .where(criteriaBuilder.and(
-                        criteriaBuilder.equal(root.get(Message_.TYPE), MessageType.BAN),
-                        criteriaBuilder.equal(joinToAuthors.get(User_.LOGIN_NAME), user.getLoginName())
-                ));
+                .where(criteriaBuilder.equal(joinToAuthors.get(User_.LOGIN_NAME), user.getLoginName()));
 
         return new HashSet<>(entityManager.createQuery(criteriaQuery).getResultList());
     }

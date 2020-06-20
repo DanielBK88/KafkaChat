@@ -2,10 +2,8 @@ package volfengaut.chatapp.message;
 
 import java.time.LocalDateTime;
 import volfengaut.chatapp.entity.chat_room.ChatRoom;
-import volfengaut.chatapp.entity.message.Message;
+import volfengaut.chatapp.entity.message.ExistingChatterInfoMessageEntity;
 import volfengaut.chatapp.entity.user.User;
-
-import static volfengaut.chatapp.entity.message.MessageType.EXISTING_CHATTER_INFO;
 
 /**
  * A message, informing a new entering chatter about chatters, which already exist in the given chat room.
@@ -22,8 +20,8 @@ public class ExistingChatterInfoMessage extends AbstractMessage {
     }
 
     @Override
-    public Message toPersistableMessage(User author, User recipient, ChatRoom room) {
-        return new Message(EXISTING_CHATTER_INFO, author, recipient, room, null, null, getTimeStamp());
+    public ExistingChatterInfoMessageEntity toPersistableMessage(User author, User recipient, ChatRoom room) {
+        return new ExistingChatterInfoMessageEntity(author, room, getTimeStamp());
     }
 
 }

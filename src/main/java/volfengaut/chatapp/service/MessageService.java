@@ -6,7 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import volfengaut.chatapp.api.repository.IMessageRepository;
 import volfengaut.chatapp.api.service.IMessageService;
-import volfengaut.chatapp.entity.message.Message;
+import volfengaut.chatapp.entity.message.AbstractMessageEntity;
+import volfengaut.chatapp.entity.message.ChatMessageEntity;
 import volfengaut.chatapp.entity.message.MessageType;
 import volfengaut.chatapp.entity.user.User;
 
@@ -17,7 +18,7 @@ public class MessageService extends AbstractDataService implements IMessageServi
     private IMessageRepository repository;
     
     @Override
-    public void addMessage(Message message) {
+    public void addMessage(AbstractMessageEntity message) {
         checkMessage(message);
         doInTransaction(m -> {
             repository.addMessage(m);
@@ -25,7 +26,7 @@ public class MessageService extends AbstractDataService implements IMessageServi
     }
 
     @Override
-    public Collection<Message> findMessagesSendBy(User user) {
+    public Collection<ChatMessageEntity> findMessagesSendBy(User user) {
         checkUser(user);
         return doInTransaction(u -> {
             return repository.findMessagesSendBy(u);
@@ -33,11 +34,10 @@ public class MessageService extends AbstractDataService implements IMessageServi
     }
 
     @Override
-    public Collection<Message> findMessagesOfType(MessageType type) {
-        checkMessageType(type);
-        return doInTransaction(t -> {
-            return repository.findMessagesOfType(t);
-        }, type, repository);
+    public <T extends AbstractMessageEntity> Collection<T> findMessagesOfType(Class<T> messageClass) {
+        return doInTransaction(m -> {
+            return repository.findMessagesOfType(m);
+        }, messageClass, repository);
     }
 
     @Override

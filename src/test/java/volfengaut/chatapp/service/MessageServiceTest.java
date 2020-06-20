@@ -8,7 +8,9 @@ import javax.persistence.Persistence;
 import org.junit.Before;
 import org.junit.Test;
 import volfengaut.chatapp.entity.chat_room.ChatRoom;
-import volfengaut.chatapp.entity.message.Message;
+import volfengaut.chatapp.entity.message.AbstractMessageEntity;
+import volfengaut.chatapp.entity.message.ChatMessageEntity;
+import volfengaut.chatapp.entity.message.StatusChangeMessageEntity;
 import volfengaut.chatapp.entity.role.Permission;
 import volfengaut.chatapp.entity.role.UserRole;
 import volfengaut.chatapp.entity.user.User;
@@ -104,18 +106,18 @@ public class MessageServiceTest {
         messageService.addMessage(message4.toPersistableMessage(petya, vasya, room));
         
         // Select messages sent by Vasya
-        Collection<Message> messages = messageService.findMessagesSendBy(vasya);
+        Collection<ChatMessageEntity> messages = messageService.findMessagesSendBy(vasya);
         
         assertEquals(2, messages.size());
-        assertTrue(messages.stream().map(Message::getText).anyMatch(t -> t.equals("Hello from Vasya to Petya")));
-        assertTrue(messages.stream().map(Message::getText).anyMatch(t -> t.equals("Goodbye from Vasya to Petya")));
+        assertTrue(messages.stream().map(ChatMessageEntity::getText).anyMatch(t -> t.equals("Hello from Vasya to Petya")));
+        assertTrue(messages.stream().map(ChatMessageEntity::getText).anyMatch(t -> t.equals("Goodbye from Vasya to Petya")));
 
         // Select messages sent by Petya
         messages = messageService.findMessagesSendBy(petya);
 
         assertEquals(2, messages.size());
-        assertTrue(messages.stream().map(Message::getText).anyMatch(t -> t.equals("Hello from Petya to Vasya")));
-        assertTrue(messages.stream().map(Message::getText).anyMatch(t -> t.equals("Goodbye from Petya to Vasya")));
+        assertTrue(messages.stream().map(ChatMessageEntity::getText).anyMatch(t -> t.equals("Hello from Petya to Vasya")));
+        assertTrue(messages.stream().map(ChatMessageEntity::getText).anyMatch(t -> t.equals("Goodbye from Petya to Vasya")));
     }
     
     @Test
@@ -147,16 +149,15 @@ public class MessageServiceTest {
         messageService.addMessage(message3.toPersistableMessage(vasya, null, room));
         
         // Select messages of type chat message
-        Collection<Message> messages = messageService.findMessagesOfType(CHAT);
+        Collection<ChatMessageEntity> chatMessages = messageService.findMessagesOfType(ChatMessageEntity.class);
 
-        assertEquals(2, messages.size());
-        assertTrue(messages.stream().allMatch(m -> m.getType().equals(CHAT)));
+        assertEquals(2, chatMessages.size());
 
         // Select messages of type status change message
-        messages = messageService.findMessagesOfType(STATUS_CHANGE);
+        Collection<StatusChangeMessageEntity> statusChangeMessages = 
+                messageService.findMessagesOfType(StatusChangeMessageEntity.class);
 
-        assertEquals(1, messages.size());
-        assertTrue(messages.stream().allMatch(m -> m.getType().equals(STATUS_CHANGE)));
+        assertEquals(1, statusChangeMessages.size());
     }
     
     @Test

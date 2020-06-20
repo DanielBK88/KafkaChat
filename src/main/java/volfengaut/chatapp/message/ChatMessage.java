@@ -3,10 +3,8 @@ package volfengaut.chatapp.message;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import volfengaut.chatapp.entity.chat_room.ChatRoom;
-import volfengaut.chatapp.entity.message.Message;
+import volfengaut.chatapp.entity.message.ChatMessageEntity;
 import volfengaut.chatapp.entity.user.User;
-
-import static volfengaut.chatapp.entity.message.MessageType.CHAT;
 
 /**
  * An implementation of {@link AbstractMessage} representing a chat message
@@ -40,8 +38,8 @@ public class ChatMessage extends AbstractMessage {
     }
 
     @Override
-    public Message toPersistableMessage(User author, User recipient, ChatRoom room) {
-        return new Message(CHAT, author, recipient, room, messageText, null, getTimeStamp());
+    public ChatMessageEntity toPersistableMessage(User author, User recipient, ChatRoom room) {
+        return new ChatMessageEntity(author, room, getTimeStamp(), recipient, messageText);
     }
 
 }

@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import volfengaut.chatapp.api.repository.EntityManagerDependent;
 import volfengaut.chatapp.entity.chat_room.ChatRoom;
-import volfengaut.chatapp.entity.message.Message;
+import volfengaut.chatapp.entity.message.AbstractMessageEntity;
 import volfengaut.chatapp.entity.message.MessageType;
 import volfengaut.chatapp.entity.role.UserRole;
 import volfengaut.chatapp.entity.user.User;
@@ -86,11 +86,10 @@ public abstract class AbstractDataService {
         checkUser(room.getCreator());
     }
     
-    protected void checkMessage(Message message) {
+    protected void checkMessage(AbstractMessageEntity message) {
         if (message == null) {
             throw new IllegalArgumentException("The message should not be null!");
         } 
-        checkMessageType(message.getType());
         checkUser(message.getAuthor());
         checkRoom(message.getRoom());
     }
@@ -110,12 +109,6 @@ public abstract class AbstractDataService {
     protected void checkRoomName(String roomName) {
         if (StringUtils.isEmpty(roomName)) {
             throw new IllegalArgumentException("The room name should not be null or empty!");
-        }
-    }
-    
-    protected void checkMessageType(MessageType type) {
-        if (type == null) {
-            throw new IllegalArgumentException("The message type should not be null!");
         }
     }
     

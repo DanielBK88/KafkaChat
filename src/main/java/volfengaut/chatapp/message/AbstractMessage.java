@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import volfengaut.chatapp.entity.chat_room.ChatRoom;
-import volfengaut.chatapp.entity.message.Message;
+import volfengaut.chatapp.entity.message.AbstractMessageEntity;
 import volfengaut.chatapp.entity.user.User;
 
 /**
@@ -35,8 +35,8 @@ public abstract class AbstractMessage implements Serializable {
     }
     
     /**
-     * Convert to an instance of {@link Message}, which can be persisted to the database
+     * Convert to an instance of {@link AbstractMessageEntity}, which can be persisted to the database
      **/
-    public abstract Message toPersistableMessage(User author, User recipient, ChatRoom room);
+    public abstract AbstractMessageEntity toPersistableMessage(User author, User recipient, ChatRoom room);
 
 }

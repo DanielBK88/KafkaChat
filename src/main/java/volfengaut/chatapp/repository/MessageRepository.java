@@ -5,11 +5,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import org.springframework.stereotype.Repository;
 import volfengaut.chatapp.api.repository.IMessageRepository;
-import volfengaut.chatapp.entity.message.Message;
-import volfengaut.chatapp.entity.message.MessageType;
+import volfengaut.chatapp.entity.message.AbstractMessageEntity;
+import volfengaut.chatapp.entity.message.ChatMessageEntity;
 import volfengaut.chatapp.entity.user.User;
 
-import static volfengaut.chatapp.entity.message.MessageType.BAN;
 
 @Repository
 public class MessageRepository implements IMessageRepository {
@@ -17,14 +16,14 @@ public class MessageRepository implements IMessageRepository {
     private EntityManager entityManager;
     
     @Override
-    public void addMessage(Message message) {
+    public void addMessage(AbstractMessageEntity message) {
         entityManager.persist(message);
     }
 
     @Override
-    public Collection<Message> findMessagesSendBy(User user) {
+    public Collection<ChatMessageEntity> findMessagesSendBy(User user) {
         String queryString = 
-                "SELECT m from Message m " 
+                "SELECT m from ChatMessageEntity m " 
                         + "JOIN m.author a "
                         + "WHERE a.loginName = :namePlaceHolder";
         Query query = entityManager.createQuery(queryString);
@@ -33,25 +32,21 @@ public class MessageRepository implements IMessageRepository {
     }
 
     @Override
-    public Collection<Message> findMessagesOfType(MessageType type) {
-        String queryString =
-                "SELECT m from Message m " 
-                        + "WHERE m.type = :typePlaceHolder";
+    public <T extends AbstractMessageEntity> Collection<T> findMessagesOfType(Class<T> messageClass) {
+        String queryString = "SELECT m from " + messageClass.getSimpleName() +  " m";
         
         Query query = entityManager.createQuery(queryString);
-        query.setParameter("typePlaceHolder", type);
         return query.getResultList();
     }
 
     @Override
     public int countBansOfUser(User user) {
         String queryString =
-                "SELECT m from Message m "
-                        + "JOIN m.recipient r "
-                        + "WHERE r.loginName = :namePlaceHolder AND m.type = :typePlaceHolder";
+                "SELECT m from BanMessageEntity m "
+                        + "JOIN m.bannedChatter r "
+                        + "WHERE r.loginName = :namePlaceHolder";
 
         Query query = entityManager.createQuery(queryString);
-        query.setParameter("typePlaceHolder", BAN);
         query.setParameter("namePlaceHolder", user.getLoginName());
         return query.getResultList().size();
     }

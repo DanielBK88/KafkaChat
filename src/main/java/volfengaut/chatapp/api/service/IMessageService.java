@@ -1,7 +1,8 @@
 package volfengaut.chatapp.api.service;
 
 import java.util.Collection;
-import volfengaut.chatapp.entity.message.Message;
+import volfengaut.chatapp.entity.message.AbstractMessageEntity;
+import volfengaut.chatapp.entity.message.ChatMessageEntity;
 import volfengaut.chatapp.entity.message.MessageType;
 import volfengaut.chatapp.entity.user.User;
 
@@ -14,17 +15,17 @@ public interface IMessageService {
     /**
      * Inserts a new message
      **/
-    void addMessage(Message message);
+    void addMessage(AbstractMessageEntity message);
 
     /**
      * Find messages sent by certain users
      **/
-    Collection<Message> findMessagesSendBy(User user);
+    Collection<ChatMessageEntity> findMessagesSendBy(User user);
 
     /**
      * Find messages of a certain type
      **/
-    Collection<Message> findMessagesOfType(MessageType type);
+    <T extends AbstractMessageEntity> Collection<T> findMessagesOfType(Class<T> messageClass);
 
     /**
      * Count, how often this user was banned
