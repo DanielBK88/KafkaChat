@@ -1,12 +1,16 @@
 package volfengaut.chatapp.entity.message;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import volfengaut.chatapp.entity.chat_room.ChatRoom;
 import volfengaut.chatapp.entity.user.User;
 import volfengaut.chatapp.message.AbstractMessage;
@@ -22,7 +26,9 @@ import static javax.persistence.EnumType.STRING;
 @Getter
 @Setter
 @Entity
-public class StatusChangeMessageEntity extends AbstractMessageEntity {
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+public class StatusChangeMessageEntity extends AbstractMessageEntity implements Serializable {
 
     /**
      * The status change that happened to the author (entering / leaving a chat room)

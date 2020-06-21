@@ -1,9 +1,9 @@
 package volfengaut.chatapp.api.service;
 
 import java.util.Collection;
+import volfengaut.chatapp.entity.WelcomeMessage;
 import volfengaut.chatapp.entity.message.AbstractMessageEntity;
 import volfengaut.chatapp.entity.message.ChatMessageEntity;
-import volfengaut.chatapp.entity.message.MessageType;
 import volfengaut.chatapp.entity.user.User;
 
 /**
@@ -31,5 +31,15 @@ public interface IMessageService {
      * Count, how often this user was banned
      **/
     int countBansOfUser(User user);
+
+    /**
+     * Get the translated welcome message
+     **/
+    String getWelcomeMessage(String language);
+    
+    /**
+     * Set the translated welcome message
+     **/
+    void setWelcomeMessage(WelcomeMessage message);
     
 }

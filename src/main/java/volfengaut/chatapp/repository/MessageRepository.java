@@ -5,6 +5,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import org.springframework.stereotype.Repository;
 import volfengaut.chatapp.api.repository.IMessageRepository;
+import volfengaut.chatapp.entity.WelcomeMessage;
 import volfengaut.chatapp.entity.message.AbstractMessageEntity;
 import volfengaut.chatapp.entity.message.ChatMessageEntity;
 import volfengaut.chatapp.entity.user.User;
@@ -49,6 +50,16 @@ public class MessageRepository implements IMessageRepository {
         Query query = entityManager.createQuery(queryString);
         query.setParameter("namePlaceHolder", user.getLoginName());
         return query.getResultList().size();
+    }
+
+    @Override
+    public WelcomeMessage getWelcomeMessage(String language) {
+        return entityManager.find(WelcomeMessage.class, language);
+    }
+
+    @Override
+    public void setWelcomeMessage(WelcomeMessage message) {
+        entityManager.merge(message);
     }
 
     @Override

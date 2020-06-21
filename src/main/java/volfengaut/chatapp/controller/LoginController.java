@@ -3,6 +3,7 @@ package volfengaut.chatapp.controller;
 import java.util.Scanner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import volfengaut.chatapp.api.service.IMessageService;
 import volfengaut.chatapp.api.service.IUserService;
 import volfengaut.chatapp.entity.user.User;
 
@@ -20,6 +21,9 @@ public class LoginController {
     
     @Autowired
     private SignUpController signUpController;
+    
+    @Autowired
+    private IMessageService messageService;
 
     public User processLogin() {
         while (true) {
@@ -27,10 +31,12 @@ public class LoginController {
             String loginName = scanner.nextLine();
             User user = userService.getUserByName(loginName);
             if (user != null) {
+                System.out.println(messageService.getWelcomeMessage("Russian"));
                 return user;
             } else {
                 user = signUpController.processSignUp(loginName);
                 if (user != null) {
+                    System.out.println(messageService.getWelcomeMessage("Russian"));
                     return user;
                 }
             }

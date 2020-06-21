@@ -8,7 +8,6 @@ import javax.persistence.Persistence;
 import org.junit.Before;
 import org.junit.Test;
 import volfengaut.chatapp.entity.chat_room.ChatRoom;
-import volfengaut.chatapp.entity.message.AbstractMessageEntity;
 import volfengaut.chatapp.entity.message.ChatMessageEntity;
 import volfengaut.chatapp.entity.message.StatusChangeMessageEntity;
 import volfengaut.chatapp.entity.role.Permission;
@@ -24,8 +23,6 @@ import volfengaut.chatapp.repository.UserRepository;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static volfengaut.chatapp.entity.message.MessageType.CHAT;
-import static volfengaut.chatapp.entity.message.MessageType.STATUS_CHANGE;
 import static volfengaut.chatapp.entity.role.Permission.SEND_PRIVATE_MESSAGES;
 import static volfengaut.chatapp.entity.role.Permission.SEND_PUBLIC_MESSAGES;
 import static volfengaut.chatapp.message.ChatterStatusChange.ENTERING;

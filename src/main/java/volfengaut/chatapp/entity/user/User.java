@@ -1,6 +1,8 @@
 package volfengaut.chatapp.entity.user;
 
+import java.io.Serializable;
 import java.time.LocalDate;
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -12,6 +14,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import volfengaut.chatapp.entity.role.Permission;
 import volfengaut.chatapp.entity.role.UserRole;
 
@@ -24,7 +28,9 @@ import volfengaut.chatapp.entity.role.UserRole;
 @Setter
 @Entity
 @Table(name = "TB_USER")
-public class User {
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+public class User implements Serializable {
     
     /**
      * The user name

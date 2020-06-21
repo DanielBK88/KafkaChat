@@ -1,9 +1,9 @@
 package volfengaut.chatapp.api.repository;
 
 import java.util.Collection;
+import volfengaut.chatapp.entity.WelcomeMessage;
 import volfengaut.chatapp.entity.message.AbstractMessageEntity;
 import volfengaut.chatapp.entity.message.ChatMessageEntity;
-import volfengaut.chatapp.entity.message.MessageType;
 import volfengaut.chatapp.entity.user.User;
 
 /**
@@ -30,4 +30,14 @@ public interface IMessageRepository extends EntityManagerDependent {
      * Count, how often this user was banned
      **/
     int countBansOfUser(User user);
+    
+    /**
+     * Get the translated welcome message
+     **/
+    WelcomeMessage getWelcomeMessage(String language);
+    
+    /**
+     * Set the translated welcome message
+     **/
+    void setWelcomeMessage(WelcomeMessage message);
 }

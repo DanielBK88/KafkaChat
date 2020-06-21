@@ -3,11 +3,13 @@ package volfengaut.chatapp.controller;
 import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import volfengaut.chatapp.entity.WelcomeMessage;
 import volfengaut.chatapp.entity.chat_room.ChatRoom;
 import volfengaut.chatapp.entity.role.Permission;
 import volfengaut.chatapp.entity.role.UserRole;
 import volfengaut.chatapp.entity.user.User;
 import volfengaut.chatapp.service.ChatRoomService;
+import volfengaut.chatapp.service.MessageService;
 import volfengaut.chatapp.service.RoleService;
 import volfengaut.chatapp.service.UserService;
 
@@ -29,7 +31,12 @@ public class TestDataController {
     @Autowired
     private ChatRoomService roomService;
     
+    @Autowired
+    private MessageService messageService;
+    
     public void fillTestData() {
+        
+        messageService.setWelcomeMessage(new WelcomeMessage("Russian", "Добро Пожаловать!"));
         UserRole chatterRole = new UserRole("chatter", SEND_PRIVATE_MESSAGES, SEND_PUBLIC_MESSAGES);
         roleService.addUserRole(chatterRole);
         UserRole adminRole = new UserRole("admin", Permission.values());

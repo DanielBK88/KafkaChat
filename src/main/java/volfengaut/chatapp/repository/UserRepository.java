@@ -13,13 +13,12 @@ import org.springframework.stereotype.Repository;
 import volfengaut.chatapp.api.repository.IUserRepository;
 import volfengaut.chatapp.entity.chat_room.ChatRoom;
 import volfengaut.chatapp.entity.chat_room.ChatRoom_;
-import volfengaut.chatapp.entity.message.AbstractMessageEntity;
 import volfengaut.chatapp.entity.message.BanMessageEntity;
 import volfengaut.chatapp.entity.message.BanMessageEntity_;
 import volfengaut.chatapp.entity.message.ChatMessageEntity;
 import volfengaut.chatapp.entity.message.ChatMessageEntity_;
-import volfengaut.chatapp.entity.message.MessageType;
 import volfengaut.chatapp.entity.role.UserRole;
+import volfengaut.chatapp.entity.role.UserRole_;
 import volfengaut.chatapp.entity.user.User;
 import volfengaut.chatapp.entity.user.User_;
 
@@ -48,10 +47,10 @@ public class UserRepository implements IUserRepository {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<User> criteriaQuery = criteriaBuilder.createQuery(User.class);
         Root<User> root = criteriaQuery.from(User.class);
-        Join<User, UserRole> joinToRoles = root.join("role");
+        Join<User, UserRole> joinToRoles = root.join(User_.ROLE);
         
-        criteriaQuery.multiselect(root.get("loginName"), root.get("role"), root.get("dateJoined"))
-                .where(criteriaBuilder.equal(joinToRoles.get("name"), role.getName()));
+        criteriaQuery.multiselect(root.get(User_.LOGIN_NAME), root.get(User_.ROLE), root.get(User_.DATE_JOINED))
+                .where(criteriaBuilder.equal(joinToRoles.get(UserRole_.NAME), role.getName()));
 
         return new HashSet<>(entityManager.createQuery(criteriaQuery).getResultList());
     }

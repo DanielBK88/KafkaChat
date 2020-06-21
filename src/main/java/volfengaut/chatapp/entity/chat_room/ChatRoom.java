@@ -1,6 +1,7 @@
 package volfengaut.chatapp.entity.chat_room;
 
 import java.io.Serializable;
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -11,6 +12,8 @@ import javax.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import volfengaut.chatapp.entity.user.User;
 
 /**
@@ -21,6 +24,8 @@ import volfengaut.chatapp.entity.user.User;
 @Setter
 @Entity
 @Table(name = "TB_ROOM")
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ChatRoom implements Serializable {
 
     /**

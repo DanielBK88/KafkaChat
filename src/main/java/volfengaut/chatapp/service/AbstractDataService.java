@@ -13,9 +13,9 @@ import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import volfengaut.chatapp.api.repository.EntityManagerDependent;
+import volfengaut.chatapp.entity.WelcomeMessage;
 import volfengaut.chatapp.entity.chat_room.ChatRoom;
 import volfengaut.chatapp.entity.message.AbstractMessageEntity;
-import volfengaut.chatapp.entity.message.MessageType;
 import volfengaut.chatapp.entity.role.UserRole;
 import volfengaut.chatapp.entity.user.User;
 
@@ -115,6 +115,16 @@ public abstract class AbstractDataService {
     protected void checkText(String text) {
         if (StringUtils.isEmpty(text)) {
             throw new IllegalArgumentException("The text should not not be null or empty!");
+        }
+    }
+    
+    protected void chekWelcomeMessage(WelcomeMessage message) {
+        if (message == null) {
+            throw new IllegalArgumentException("The message not not be null!");
+        } else if (StringUtils.isEmpty(message.getMessage())) {
+            throw new IllegalArgumentException("The text of the message should not not be null or empty!");
+        } else if (StringUtils.isEmpty(message.getLanguage())) {
+            throw new IllegalArgumentException("The language should not not be null or empty!");
         }
     }
 

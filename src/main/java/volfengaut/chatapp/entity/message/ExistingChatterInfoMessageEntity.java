@@ -1,10 +1,14 @@
 package volfengaut.chatapp.entity.message;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
+import javax.persistence.Cacheable;
 import javax.persistence.Entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import volfengaut.chatapp.entity.chat_room.ChatRoom;
 import volfengaut.chatapp.entity.user.User;
 import volfengaut.chatapp.message.AbstractMessage;
@@ -18,7 +22,9 @@ import volfengaut.chatapp.message.ExistingChatterInfoMessage;
 @Getter
 @Setter
 @Entity
-public class ExistingChatterInfoMessageEntity extends AbstractMessageEntity {
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+public class ExistingChatterInfoMessageEntity extends AbstractMessageEntity implements Serializable {
 
     public ExistingChatterInfoMessageEntity(User author,
             ChatRoom room, LocalDateTime time) {

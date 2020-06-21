@@ -3,7 +3,6 @@ package volfengaut.chatapp.service;
 import java.time.LocalDate;
 import java.util.Collection;
 import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import volfengaut.chatapp.api.repository.IUserRepository;
@@ -33,7 +32,6 @@ public class UserService extends AbstractDataService implements IUserService {
         doInTransaction(u -> {
             repository.deleteUser(u);
         }, user, repository);
-
     }
 
     @Override

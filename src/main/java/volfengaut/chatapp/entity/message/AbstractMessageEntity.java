@@ -1,8 +1,9 @@
 package volfengaut.chatapp.entity.message;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -11,16 +12,11 @@ import javax.persistence.MappedSuperclass;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import volfengaut.chatapp.entity.chat_room.ChatRoom;
 import volfengaut.chatapp.entity.user.User;
 import volfengaut.chatapp.message.AbstractMessage;
-import volfengaut.chatapp.message.ChatMessage;
-import volfengaut.chatapp.message.ChatterBannedMessage;
-import volfengaut.chatapp.message.ChatterStatusChange;
-import volfengaut.chatapp.message.ChatterStatusChangeMessage;
-import volfengaut.chatapp.message.ExistingChatterInfoMessage;
-
-import static javax.persistence.EnumType.STRING;
 
 /**
  * Base class of message entities
@@ -29,7 +25,9 @@ import static javax.persistence.EnumType.STRING;
 @Getter
 @Setter
 @MappedSuperclass
-public abstract class AbstractMessageEntity {
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+public abstract class AbstractMessageEntity implements Serializable {
     
     @Id
     @GeneratedValue
