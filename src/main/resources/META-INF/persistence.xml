@@ -19,16 +19,7 @@
       <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL8Dialect" />
       <property name="hibernate.show_sql" value="true" />
       <property name="hibernate.hbm2ddl.auto" value="update" />
-      
-      <property name="hibernate.cache.use_second_level_cache" value="true" />
-      <property name="hibernate.cache.use_query_cache" value="true" />
-      <property name="hibernate.cache.use_minimal_puts" value="true" />
-      <property name="hibernate.cache.hazelcast.use_lite_member" value="true" />
-      <property name="hibernate.cache.region_prefix" value="chat_app"/>
-      <property name="hibernate.cache.provider_configuration_file_resource_path"
-        value="hazelcast.xml" />
-      <property name="hibernate.cache.region.factory_class"
-        value="com.hazelcast.hibernate.HazelcastLocalCacheRegionFactory" />
+
     </properties>
 
   </persistence-unit>
@@ -48,16 +39,6 @@
       <property name="hibernate.hbm2ddl.import_files" value="sql/import-users.sql"/>
       <property name="hibernate.show_sql" value="true"/>
       <property name="hibernate.format_sql" value="false"/>
-
-      <property name="hibernate.cache.use_second_level_cache" value="true" />
-      <property name="hibernate.cache.use_query_cache" value="true" />
-      <property name="hibernate.cache.use_minimal_puts" value="true" />
-      <property name="hibernate.cache.hazelcast.use_lite_member" value="true" />
-      <property name="hibernate.cache.region_prefix" value="chat_app"/>
-      <property name="hibernate.cache.provider_configuration_file_resource_path"
-        value="hazelcast.xml" />
-      <property name="hibernate.cache.region.factory_class"
-        value="com.hazelcast.hibernate.HazelcastLocalCacheRegionFactory" />
     </properties>
     
   </persistence-unit>

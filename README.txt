@@ -1,33 +1,49 @@
-How to use this KafkaChatter:
+How to use this Websocket chatter:
 
-1) PREREQUISTES:
-- The ZooKeeper server must be running on localhost:2181
-- The Kafka server must be running on localhost:9092
-- The MySql 8 server must be running on port 3306 (change the root password in persistence.xml accordingly)
-- A database named 'chat-db' must exist in MySql (you can change the expected name in persistence.xml).
-  It may be empty in the beginning (contain no tables).
-  
-  
-2) To create a basic set of test data, run the TestDataCreation class. It will create a few users, roles and rooms
-(here it is important that Kafka is already running, because room creation is always coupled with Kafka topics creation)
+1) PREREQUSITE: The Database specified in persistence.xml should be running (now defined: MySQL8).
 
-3) Start the application by running the ChatApplication class.
-Each running instance is a chatter.
+2) Run the TestDataCreation class. It will insert two roles (chatter and admin) into the database with
+corresponding permissions.
 
-4) When starting the application, it will ask to enter a login name and a chat room name to use.
-The application will create a new Kafka topic with the given chat room name, if such a topic does not yet exist.
-Though, only administrators can create new chat rooms! The test data set contain also an admin account.
-Afterwards, the new chatter will enter the chat room and will be able to chat with other chatters, who have
-selected the same chat room. All messages between the participants of this chat room will run
-over this same topic.
+3) Start the server (run the ChatServer class). The server port is defined in CommonConstants.
 
-5) The application will run a loop asking the user for inputs.
-Per default, any input line will be treated as a public message to all other chat room participants.
-When beginning the input with "-to <some-player-name>", then this message will be sent as a private message
-to the chatter with the specified name. Other chatters will not see it.
-When beginning the input with "-ban <some-player-name>", the corresponding chatter will be banned from this chat room
-(needs admin permissions!). The following text of the input will be shown as the reason of banning to the banned user.
+4) Start a client (run the ChatClient class). It will connect to the server automatically.
 
-5) To exit the chat room and the application, type "exit".
+5) Create an account using corresponding commands. The chat application will print out possible commands to help you.
+Example: 
 
-6) UNIT TESTS are currently configured to run on a separate hsql data base. Change the configuration if needed.
+-sign_up_name MyUser
+-sign_up_pw AValidPW88!!
+-sign_up_pw_confirm AValidPW88!!
+
+After the third command the new user will be stored to the database.
+This means, if you restart the server and the client, you will be able to login as this user as follows:
+
+-login MyUser
+-pw AValidPW88!!
+
+After signing up successfully, you are logged in automatically.
+
+6) Start more chat client instances to sign up other users.
+
+7) Open a new chat room with any of the logged in users:
+
+-room_open myRoomName
+
+8) Let other logged in chatters join this room:
+
+-room_select myRoomName
+
+Chatters, who are already inside the room, will be notified about new joined participants.
+And the newcomers will also be informed about already existing chatters.
+
+9) Now you can chat!
+Send public messages as follows:
+
+-pub Some Message
+
+Send private messages as follows:
+
+-priv Some Message -to SomeUser
+
+10) Have fun :)
